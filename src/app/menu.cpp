@@ -7,55 +7,68 @@
 
 void runMenu() {
     int m, k;
+    int choice;
 
     std::cout << "===== BLOOM FILTER =====\n";
-
     std::cout << "Nhap m (so bit): ";
     std::cin >> m;
-
     std::cout << "Nhap k (so ham bam): ";
     std::cin >> k;
 
-    // Khoi tao Bloom Filter
     BloomFilter bf(m, k);
 
-    // Mo file input
-    std::ifstream in("input.txt");
-    if (!in) {
-        std::cout << "Khong mo duoc file input.txt\n";
-        std::cout << "Dat input.txt cung cap voi file exe\n";
-        std::cout << "Nhan Enter de thoat...";
-        std::cin.ignore();
-        std::cin.get();
+    std::cout << "\n1. Doc ID tu file\n";
+    std::cout << "2. Nhap ID bang tay\n";
+    std::cout << "Chon che do: ";
+    std::cin >> choice;
+
+    int id;
+    int n = 0;
+
+    HashTable ht(2000); // du dung cho ca 2 che do
+
+    // ===== CHE DO 1: DOC FILE =====
+    if (choice == 1) {
+        std::ifstream in("input.txt");
+        if (!in) {
+            std::cout << "Khong mo duoc file input.txt\n";
+            return;
+        }
+
+        while (in >> id) {
+            bf.add(id);
+            ht.insert(id);
+            n++;
+        }
+        in.close();
+
+        std::cout << "Da doc " << n << " ID tu file\n";
+    }
+
+    // ===== CHE DO 2: NHAP TAY =====
+    else if (choice == 2) {
+        std::cout << "Nhap cac ID (nhap -1 de ket thuc):\n";
+
+        while (true) {
+            std::cin >> id;
+            if (id == -1) break;
+
+            bf.add(id);
+            ht.insert(id);
+            n++;
+        }
+
+        std::cout << "Da nhap " << n << " ID bang tay\n";
+    }
+
+    else {
+        std::cout << "Lua chon khong hop le\n";
         return;
     }
 
-    // Dem so ID
-    int id;
-    int n = 0;
-    while (in >> id) {
-        n++;
-    }
-
-    in.clear();
-    in.seekg(0);
-
-    // Hash table luu du lieu that
-    HashTable ht(n * 2);
-
-    // Doc ID vao Bloom Filter + HashTable
-    while (in >> id) {
-        bf.add(id);
-        ht.insert(id);
-    }
-
-    in.close();
-
-    std::cout << "\nDa doc " << n << " ID tu file\n";
-
     // ===== TRUY VAN =====
     std::cout << "\n===== TRUY VAN ID =====\n";
-    std::cout << "Nhap ID (-1 de thoat): ";
+    std::cout << "Nhap ID can kiem tra (-1 de thoat): ";
 
     int queryId;
     while (std::cin >> queryId && queryId != -1) {
@@ -71,7 +84,7 @@ void runMenu() {
             std::cout << "=> FALSE POSITIVE\n";
         }
 
-        std::cout << "\nNhap ID (-1 de thoat): ";
+        std::cout << "\nNhap ID can kiem tra (-1 de thoat): ";
     }
     return;
 }
