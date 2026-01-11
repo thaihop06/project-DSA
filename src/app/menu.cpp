@@ -67,7 +67,31 @@ void runMenu() {
     std::cout << "False Positive   : " << falsePositive << "\n";
     std::cout << "Rate             : " << rate << "\n";
     std::cout << "Da xuat file     : report.csv\n";
-    std::cout << "\nNhan Enter de thoat...";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "\n===== TRUY VAN ID =====\n";
+    std::cout << "Nhap ID can kiem tra (-1 de thoat): ";
+
+    while (true) {
+        int queryId;
+        std::cin >> queryId;
+
+        if (queryId == -1) break;
+
+        bool bloomResult = bf.possiblyContains(queryId);
+        bool realResult  = ht.contains(queryId);
+
+        std::cout << "Bloom Filter : "
+                  << (bloomResult ? "Co the co" : "Khong co") << "\n";
+        std::cout << "Thuc te      : "
+                  << (realResult ? "Co" : "Khong co") << "\n";
+
+        if (bloomResult && !realResult) {
+            std::cout << "=> FALSE POSITIVE\n";
+        }
+
+        std::cout << "\nNhap ID can kiem tra (-1 de thoat): ";
+    }
+
+    std::cout << "Nhan Enter de thoat...";
+    std::cin.ignore();
     std::cin.get();
 }
