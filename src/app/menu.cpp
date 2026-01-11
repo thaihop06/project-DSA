@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <limits>
 
 #include "app/menu.hpp"
 #include "ds/bloom_filter.hpp"
@@ -8,9 +7,8 @@
 
 void runMenu() {
     int m, k;
-    int n = 0;
 
-    std::cout << "===== BLOOM FILTER (FILE INPUT) =====\n";
+    std::cout << "===== BLOOM FILTER =====\n";
 
     std::cout << "Nhap m (so bit): ";
     std::cin >> m;
@@ -18,80 +16,62 @@ void runMenu() {
     std::cout << "Nhap k (so ham bam): ";
     std::cin >> k;
 
+    // Khoi tao Bloom Filter
     BloomFilter bf(m, k);
 
-    std::ifstream in("data/input.txt");
+    // Mo file input
+    std::ifstream in("input.txt");
     if (!in) {
-        std::cout << "Khong mo duoc file data/input.txt\n";
+        std::cout << "Khong mo duoc file input.txt\n";
+        std::cout << "Dat input.txt cung cap voi file exe\n";
+        std::cout << "Nhan Enter de thoat...";
+        std::cin.ignore();
+        std::cin.get();
         return;
     }
 
     // Dem so ID
     int id;
+    int n = 0;
     while (in >> id) {
         n++;
     }
+
     in.clear();
     in.seekg(0);
 
+    // Hash table luu du lieu that
     HashTable ht(n * 2);
 
-    // Doc ID tu file
+    // Doc ID vao Bloom Filter + HashTable
     while (in >> id) {
         bf.add(id);
         ht.insert(id);
     }
+
     in.close();
 
-    // Test false positive
-    int testCount = 1000;
-    int falsePositive = 0;
+    std::cout << "\nDa doc " << n << " ID tu file\n";
 
-    for (int i = 0; i < testCount; i++) {
-        int testId = n * 10 + i;
-        if (bf.possiblyContains(testId) && !ht.contains(testId)) {
-            falsePositive++;
-        }
-    }
-
-    double rate = static_cast<double>(falsePositive) / testCount;
-
-    // Xuat file bao cao
-    std::ofstream out("report.csv");
-    out << "m,k,false_positive,rate\n";
-    out << m << "," << k << "," << falsePositive << "," << rate << "\n";
-    out.close();
-
-    std::cout << "\n===== KET QUA =====\n";
-    std::cout << "So ID doc tu file: " << n << "\n";
-    std::cout << "False Positive   : " << falsePositive << "\n";
-    std::cout << "Rate             : " << rate << "\n";
-    std::cout << "Da xuat file     : report.csv\n";
+    // ===== TRUY VAN =====
     std::cout << "\n===== TRUY VAN ID =====\n";
-    std::cout << "Nhap ID can kiem tra (-1 de thoat): ";
+    std::cout << "Nhap ID (-1 de thoat): ";
 
-    while (true) {
-        int queryId;
-        std::cin >> queryId;
-
-        if (queryId == -1) break;
-
-        bool bloomResult = bf.possiblyContains(queryId);
-        bool realResult  = ht.contains(queryId);
+    int queryId;
+    while (std::cin >> queryId && queryId != -1) {
+        bool inBloom = bf.possiblyContains(queryId);
+        bool inReal  = ht.contains(queryId);
 
         std::cout << "Bloom Filter : "
-                  << (bloomResult ? "Co the co" : "Khong co") << "\n";
+                  << (inBloom ? "Co the co" : "Khong co") << "\n";
         std::cout << "Thuc te      : "
-                  << (realResult ? "Co" : "Khong co") << "\n";
+                  << (inReal ? "Co" : "Khong co") << "\n";
 
-        if (bloomResult && !realResult) {
+        if (inBloom && !inReal) {
             std::cout << "=> FALSE POSITIVE\n";
         }
 
-        std::cout << "\nNhap ID can kiem tra (-1 de thoat): ";
+        std::cout << "\nNhap ID (-1 de thoat): ";
     }
-
-    std::cout << "Nhan Enter de thoat...";
-    std::cin.ignore();
-    std::cin.get();
+    return;
 }
