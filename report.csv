@@ -1,2 +1,12 @@
+#THONG_KE
 m,k,false_positive,rate
-7,4,0,0
+213,122,322,0.322
+
+#TRUY_VAN
+query_id,bloom_result,real_result,false_positive
+0,co,co,0
+12,khong,khong,0
+3,co,khong,1
+41,khong,khong,0
+5,co,khong,1
+1561,khong,khong,0

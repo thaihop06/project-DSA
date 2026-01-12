@@ -25,7 +25,7 @@ void runMenu() {
     int id;
     int n = 0;
 
-    HashTable ht(2000); // du dung cho ca 2 che do
+    HashTable ht(2000); // du dung
 
     // ===== CHE DO 1: DOC FILE =====
     if (choice == 1) {
@@ -48,7 +48,6 @@ void runMenu() {
     // ===== CHE DO 2: NHAP TAY =====
     else if (choice == 2) {
         std::cout << "Nhap cac ID (nhap -1 de ket thuc):\n";
-
         while (true) {
             std::cin >> id;
             if (id == -1) break;
@@ -57,7 +56,6 @@ void runMenu() {
             ht.insert(id);
             n++;
         }
-
         std::cout << "Da nhap " << n << " ID bang tay\n";
     }
 
@@ -66,7 +64,29 @@ void runMenu() {
         return;
     }
 
-    // ===== TRUY VAN =====
+    // mo file
+    std::ofstream csv("report.csv");
+    csv << "#THONG_KE\n";
+    csv << "m,k,false_positive,rate\n";
+
+    int falsePositive = 0;
+    int testCount = 1000;
+
+    //thong ke false positive
+    for (int i = 0; i < testCount; i++) {
+        int testId = n * 10 + i;
+        if (bf.possiblyContains(testId) && !ht.contains(testId)) {
+            falsePositive++;
+        }
+    }
+
+    double rate = static_cast<double>(falsePositive) / testCount;
+    csv << m << "," << k << "," << falsePositive << "," << rate << "\n\n";
+
+    csv << "#TRUY_VAN\n";
+    csv << "query_id,bloom_result,real_result,false_positive\n";
+
+    // truy van
     std::cout << "\n===== TRUY VAN ID =====\n";
     std::cout << "Nhap ID can kiem tra (-1 de thoat): ";
 
@@ -75,16 +95,26 @@ void runMenu() {
         bool inBloom = bf.possiblyContains(queryId);
         bool inReal  = ht.contains(queryId);
 
+        int isFalsePositive = (inBloom && !inReal) ? 1 : 0;
+
         std::cout << "Bloom Filter : "
                   << (inBloom ? "Co the co" : "Khong co") << "\n";
         std::cout << "Thuc te      : "
                   << (inReal ? "Co" : "Khong co") << "\n";
 
-        if (inBloom && !inReal) {
+        if (isFalsePositive) {
             std::cout << "=> FALSE POSITIVE\n";
         }
 
-        std::cout << "\nNhap ID can kiem tra (-1 de thoat): ";
+        // ghi vo file
+        csv << queryId << ","
+            << (inBloom ? "co" : "khong") << ","
+            << (inReal ? "co" : "khong") << ","
+            << isFalsePositive << "\n";
+
+        std::cout << "\nNhap ID can kiem tra (-1 de thoat va xuat file report): ";
     }
-    return;
+
+    csv.close();
+
 }
