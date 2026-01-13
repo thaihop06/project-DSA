@@ -27,9 +27,9 @@ void runMenu() {
 
     HashTable ht(2000); // du dung
 
-    // ===== CHE DO 1: DOC FILE =====
+    // 1. doc file
     if (choice == 1) {
-        std::ifstream in("input.txt");
+        std::ifstream in("data/input/input.txt");
         if (!in) {
             std::cout << "Khong mo duoc file input.txt\n";
             return;
@@ -45,7 +45,7 @@ void runMenu() {
         std::cout << "Da doc " << n << " ID tu file\n";
     }
 
-    // ===== CHE DO 2: NHAP TAY =====
+    // 2. nhap id
     else if (choice == 2) {
         std::cout << "Nhap cac ID (nhap -1 de ket thuc):\n";
         while (true) {
@@ -65,7 +65,7 @@ void runMenu() {
     }
 
     // mo file
-    std::ofstream csv("report.csv");
+    std::ofstream csv("report/report.csv");
     csv << "#THONG_KE\n";
     csv << "m,k,false_positive,rate\n";
 
